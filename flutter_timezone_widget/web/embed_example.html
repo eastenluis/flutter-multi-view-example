@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flutter Timezone Widget - Embed Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    .widget-container {
+      margin: 20px;
+      padding: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: inline-block;
+      width: 300px;
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .widget-container flutter-view {
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .controls {
+      text-align: center;
+      margin: 20px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Flutter Timezone Widget - Multi-View Demo</h1>
+    
+    <div class="controls">
+      <button onclick="addTimezoneWidget('America/New_York')">Add EST Widget</button>
+      <button onclick="addTimezoneWidget('America/Los_Angeles')">Add PST Widget</button>
+      <button onclick="addTimezoneWidget('Europe/London')">Add GMT Widget</button>
+      <button onclick="addTimezoneWidget('Asia/Tokyo')">Add JST Widget</button>
+      <button onclick="clearWidgets()">Clear All</button>
+    </div>
+    
+    <div id="widgets-container">
+      <!-- Flutter widgets will be added here -->
+    </div>
+  </div>
+
+  <!-- Load Flutter's default script and our multi-view bootstrap -->
+  <script src="flutter.js" defer></script>
+  <script src="flutter_bootstrap.js" defer></script>
+  
+  <script>
+    let widgetCount = 0;
+    
+    function addTimezoneWidget(timezone) {
+      // Check if Flutter multi-view is ready
+      if (!window.FlutterMultiView || !window.FlutterMultiView.isReady()) {
+        console.log('Flutter multi-view not ready yet. Please wait...');
+        alert('Flutter is still loading. Please wait a moment and try again.');
+        return;
+      }
+      
+      widgetCount++;
+      const widgetId = 'flutter-widget-' + widgetCount;
+      
+      // Create container for the Flutter widget
+      const container = document.createElement('div');
+      container.id = widgetId;
+      container.className = 'widget-container';
+      container.innerHTML = '<p>Loading Flutter widget for ' + timezone + '...</p>';
+      
+      document.getElementById('widgets-container').appendChild(container);
+      
+      // Add Flutter view to the container
+      try {
+        console.log('Adding view with timezone:', timezone);
+        const viewId = window.FlutterMultiView.addView(container, {
+          initialData: { timezone: timezone }
+        });
+        console.log('View added with ID:', viewId, 'and timezone:', timezone);
+      } catch (error) {
+        console.error('Error adding Flutter widget:', error);
+        container.innerHTML = '<p>Error loading widget: ' + error.message + '</p>';
+      }
+    }
+    
+    function clearWidgets() {
+      const container = document.getElementById('widgets-container');
+      container.innerHTML = '';
+      widgetCount = 0;
+    }
+    
+    // Listen for Flutter multi-view ready event
+    window.addEventListener('flutter-multi-view-ready', function(event) {
+      console.log('Flutter multi-view is ready!', event.detail);
+      
+      // Enable buttons or show ready status
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(button => {
+        button.style.opacity = '1';
+        button.disabled = false;
+      });
+    });
+    
+    // Initially disable buttons until Flutter is ready
+    window.addEventListener('load', function() {
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(button => {
+        button.style.opacity = '0.6';
+        button.disabled = true;
+      });
+      
+      console.log('Page loaded. Waiting for Flutter multi-view to initialize...');
+    });
+  </script>
+</body>
+</html>
